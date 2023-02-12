@@ -3,7 +3,7 @@
 set PYTHON=
 set GIT=
 set VENV_DIR=
-set COMMANDLINE_ARGS=--opt-split-attention --medvram
+set COMMANDLINE_ARGS=--xformers --opt-split-attention --medvram
 
 rem --listen
 rem --skip-python-version-check
