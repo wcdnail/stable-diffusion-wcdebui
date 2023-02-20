@@ -3,9 +3,9 @@
 set PYTHON=
 set GIT=
 set VENV_DIR=
-set COMMANDLINE_ARGS=
+set COMMANDLINE_ARGS=--xformers --opt-split-attention
 
-rem --xformers --opt-split-attention 
+rem  
 rem --theme dark
 rem --listen
 rem --skip-python-version-check
