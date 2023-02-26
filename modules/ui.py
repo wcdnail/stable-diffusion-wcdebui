@@ -1210,11 +1210,12 @@ def create_ui():
 
                 script_callbacks.ui_train_tabs_callback(params)
 
-            with gr.Column(elem_id='ti_gallery_container'):
-                ti_output = gr.Text(elem_id="ti_output", value="", show_label=False)
-                ti_gallery = gr.Gallery(label='Output', show_label=False, elem_id='ti_gallery').style(grid=4)
-                ti_progress = gr.HTML(elem_id="ti_progress", value="")
-                ti_outcome = gr.HTML(elem_id="ti_error", value="")
+            with gr.Column(variant='panel', elem_id='ti_temp_results'):
+                with gr.Group(elem_id='ti_results_grp'):
+                    ti_output = gr.Text(elem_id="ti_output", value="...", show_label=False)
+                    ti_gallery = gr.Gallery(label='Output', show_label=False, elem_id='ti_gallery').style(grid=4)
+                    ti_progress = gr.HTML(elem_id="ti_progress", value="")
+                    ti_outcome = gr.HTML(elem_id="ti_error", value="")
 
         create_embedding.click(
             fn=modules.textual_inversion.ui.create_embedding,
