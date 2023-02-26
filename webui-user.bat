@@ -3,7 +3,7 @@
 set PYTHON=
 set GIT=
 set VENV_DIR=
-set COMMANDLINE_ARGS=--xformers --allow-code --enable-console-prompts --no-half --precision full
+set COMMANDLINE_ARGS=--xformers --allow-code --enable-console-prompts --no-half --precision full --theme dark
 
 rem  --opt-split-attention
 rem --theme dark
