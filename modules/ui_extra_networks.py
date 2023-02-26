@@ -7,12 +7,12 @@ from modules import shared
 import gradio as gr
 import json
 import html
-
+from modules.ui_components import ToolButton
 from modules.generation_parameters_copypaste import image_from_url_text
 
 extra_pages = []
 allowed_dirs = set()
-
+refresh_symbol = '\U0001f504'  # 🔄
 
 def register_page(page):
     """registers extra networks page for the UI; recommend doing it in on_before_ui() callback for extensions"""
@@ -63,7 +63,7 @@ class ExtraNetworksPage:
         return ""
 
     def create_html(self, tabname):
-        view = shared.opts.extra_networks_default_view
+        view = "cards" #shared.opts.extra_networks_default_view
         items_html = ''
 
         subdirs = {}
@@ -174,25 +174,25 @@ def create_ui(container, button, tabname):
     ui.pages = []
     ui.stored_extra_pages = pages_in_preferred_order(extra_pages.copy())
     ui.tabname = tabname
+    with gr.Accordion("Extra Networks", open=False): 
+        with gr.Tabs(elem_id=tabname+"_extra_tabs") as tabs:
+            for page in ui.stored_extra_pages:
+                with gr.Tab(page.title):
+                    page_elem = gr.HTML(page.create_html(ui.tabname))
+                    ui.pages.append(page_elem)
 
-    with gr.Tabs(elem_id=tabname+"_extra_tabs") as tabs:
-        for page in ui.stored_extra_pages:
-            with gr.Tab(page.title):
-                page_elem = gr.HTML(page.create_html(ui.tabname))
-                ui.pages.append(page_elem)
+        filter = gr.Textbox('', show_label=False, elem_id=tabname+"_extra_search", placeholder="Search...", visible=False)
+        button_refresh = ToolButton(value=refresh_symbol, elem_id=tabname+"_extra_refresh")                    
+        button_close = gr.Button('Close', elem_id=tabname+"_extra_close")
 
-    filter = gr.Textbox('', show_label=False, elem_id=tabname+"_extra_search", placeholder="Search...", visible=False)
-    button_refresh = gr.Button('Refresh', elem_id=tabname+"_extra_refresh")
-    button_close = gr.Button('Close', elem_id=tabname+"_extra_close")
-
-    ui.button_save_preview = gr.Button('Save preview', elem_id=tabname+"_save_preview", visible=False)
-    ui.preview_target_filename = gr.Textbox('Preview save filename', elem_id=tabname+"_preview_filename", visible=False)
+        ui.button_save_preview = gr.Button('Save preview', elem_id=tabname+"_save_preview", visible=False)
+        ui.preview_target_filename = gr.Textbox('Preview save filename', elem_id=tabname+"_preview_filename", visible=False)
 
     def toggle_visibility(is_visible):
         is_visible = not is_visible
         return is_visible, gr.update(visible=is_visible)
 
-    state_visible = gr.State(value=False)
+    state_visible = gr.State(value=True)
     button.click(fn=toggle_visibility, inputs=[state_visible], outputs=[state_visible, container])
     button_close.click(fn=toggle_visibility, inputs=[state_visible], outputs=[state_visible, container])
 
