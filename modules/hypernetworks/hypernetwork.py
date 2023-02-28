@@ -467,7 +467,8 @@ def report_statistics(loss_info:dict):
 def create_hypernetwork(name, enable_sizes, overwrite_old, layer_structure=None, activation_func=None, weight_init=None, add_layer_norm=False, use_dropout=False, dropout_structure=None):
     # Remove illegal characters from name.
     name = "".join( x for x in name if (x.isalnum() or x in "._- "))
-    assert name, "Name cannot be empty!"
+    if len(name) < 1:
+        raise Exception("Invalid filename")
 
     fn = os.path.join(shared.cmd_opts.hypernetwork_dir, f"{name}.pt")
     if not overwrite_old:
