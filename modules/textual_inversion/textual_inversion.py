@@ -267,6 +267,9 @@ def create_embedding(name, num_vectors_per_token, overwrite_old, init_text='*'):
 
     # Remove illegal characters from name.
     name = "".join( x for x in name if (x.isalnum() or x in "._- "))
+    if len(name) < 1:
+        raise Exception("Invalid filename")
+
     fn = os.path.join(shared.cmd_opts.embeddings_dir, f"{name}.pt")
     if not overwrite_old:
         assert not os.path.exists(fn), f"file {fn} already exists"

@@ -467,7 +467,8 @@ def report_statistics(loss_info:dict):
 def create_hypernetwork(name, enable_sizes, overwrite_old, layer_structure=None, activation_func=None, weight_init=None, add_layer_norm=False, use_dropout=False, dropout_structure=None):
     # Remove illegal characters from name.
     name = "".join( x for x in name if (x.isalnum() or x in "._- "))
-    assert name, "Name cannot be empty!"
+    if len(name) < 1:
+        raise Exception("Invalid filename")
 
     fn = os.path.join(shared.cmd_opts.hypernetwork_dir, f"{name}.pt")
     if not overwrite_old:
@@ -494,6 +495,8 @@ def create_hypernetwork(name, enable_sizes, overwrite_old, layer_structure=None,
     hypernet.save(fn)
 
     shared.reload_hypernetworks()
+
+    return fn
 
 
 def train_hypernetwork(id_task, hypernetwork_name, learn_rate, batch_size, gradient_step, data_root, log_directory, training_width, training_height, varsize, steps, clip_grad_mode, clip_grad_value, shuffle_tags, tag_drop_out, latent_sampling_method, use_weight, create_image_every, save_hypernetwork_every, template_filename, preview_from_txt2img, preview_prompt, preview_negative_prompt, preview_steps, preview_sampler_index, preview_cfg_scale, preview_seed, preview_width, preview_height):
