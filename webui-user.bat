@@ -10,10 +10,10 @@ rem --listen
 rem --skip-python-version-check
 rem -- Жор слишком велик для 12Гб VRAM -- --no-half --precision full 
 
-set COMMANDLINE_ARGS=--medvram --xformers --enable-console-prompts --theme dark
+set COMMANDLINE_ARGS=--medvram --xformers --enable-console-prompts --theme dark --api
 if "%COMPUTERNAME%"=="MIGELE0X" (
     echo HIVRAM 
-    set COMMANDLINE_ARGS=--xformers --allow-code --enable-console-prompts --theme dark
+    set COMMANDLINE_ARGS=--xformers --allow-code --enable-console-prompts --theme dark --api
 )
 
 call webui.bat
