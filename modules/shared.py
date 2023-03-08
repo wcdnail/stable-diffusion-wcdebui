@@ -414,6 +414,7 @@ options_templates.update(options_section(('sd', "Stable Diffusion"), {
     "CLIP_stop_at_last_layers": OptionInfo(1, "Clip skip", gr.Slider, {"minimum": 1, "maximum": 12, "step": 1}),
     "upcast_attn": OptionInfo(False, "Upcast cross attention layer to float32"),
     "sd_max_resolution": OptionInfo(2048, "Max resolution output for txt2img and img2img"),
+    
 }))
 
 options_templates.update(options_section(('compatibility', "Compatibility"), {
@@ -439,14 +440,13 @@ options_templates.update(options_section(('interrogate', "Interrogate Options"),
 }))
 
 options_templates.update(options_section(('extra_networks', "Extra Networks"), {
-    #"extra_networks_default_view": OptionInfo("cards", "Default view for Extra Networks", gr.Dropdown, {"choices": ["cards", "thumbs"]}),
     "extra_networks_default_multiplier": OptionInfo(1.0, "Multiplier for extra networks", gr.Slider, {"minimum": 0.0, "maximum": 1.0, "step": 0.01}),
     "sd_hypernetwork": OptionInfo("None", "Add hypernetwork to prompt", gr.Dropdown, lambda: {"choices": [""] + [x for x in hypernetworks.keys()]}, refresh=reload_hypernetworks),
     "extra_networks_default_visibility": OptionInfo(True, "Extra Networks default visibility"),
     "extra_networks_cards_size": OptionInfo(1, "Card size for extra networks", gr.Slider, {"minimum": 0.8, "maximum": 2, "step": 0.1}),
     "extra_networks_cards_visible_rows": OptionInfo(1, "Visible card rows for extra networks", gr.Slider, {"minimum": 1, "maximum": 3, "step": 1}),
     "extra_networks_aside": OptionInfo(True, "Extra Networks aside view"),
-    
+  
 }))
 
 options_templates.update(options_section(('ui', "User interface"), {
@@ -471,6 +471,8 @@ options_templates.update(options_section(('ui', "User interface"), {
     "ui_header_tabs": OptionInfo("", "Header Tabs"),
     "ui_views_order": OptionInfo("row-reverse", "Interface order input/parameters | output/preview", gr.Radio, {"choices": ["row", "row-reverse"]}),
     "ui_extra_networks_tab_reorder": OptionInfo("", "Extra networks tab order"),
+    "ui_performant_gradio_input_components": OptionInfo("", "Performant gradio input components. Use css selectors"),
+    "ui_output_image_fit": OptionInfo("Scale-down", "Generated image fit method", gr.Radio, {"choices": ["Scale-down", "Contain"]}),
     "localization": OptionInfo("None", "Localization (requires restart)", gr.Dropdown, lambda: {"choices": ["None"] + list(localization.localizations.keys())}, refresh=lambda: localization.list_localizations(cmd_opts.localizations_dir)),
 }))
 
