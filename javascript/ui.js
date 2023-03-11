@@ -201,12 +201,14 @@ function recalculatePromptTokens(name){
 }
 
 function recalculate_prompts_txt2img(){
+	//console.log("txt2img_prompt");
     recalculatePromptTokens('txt2img_prompt')
     recalculatePromptTokens('txt2img_neg_prompt')
     return args_to_array(arguments);
 }
 
 function recalculate_prompts_img2img(){
+	//console.log("img2img_prompt");
     recalculatePromptTokens('img2img_prompt')
     recalculatePromptTokens('img2img_neg_prompt')
     return args_to_array(arguments);
@@ -386,10 +388,6 @@ onUiUpdate(function(){
 	
 	
 	let selectedTabItemId = "tab_txt2img";
-	let net_container = gradioApp().querySelector('#txt2img_extra_networks_row');
-	let net_menu_open = false;
-	const net_menu = gradioApp().querySelector('#extra_networks_menu');
-	
 	/* switch tab item from instance button, this is the only method that works i havent found a workaround yet */ 
 	const Observe = (sel, opt, cb) => {
 	  const Obs = new MutationObserver((m) => [...m].forEach(cb));
@@ -416,26 +414,28 @@ onUiUpdate(function(){
 		gradioApp().querySelectorAll('#tabs > div > button').forEach(function (tab, index){
 			tab.setAttribute("tab-id", index);
 			tab.removeEventListener('mouseup', navTabClicked);
-			tab.addEventListener('mouseup', navTabClicked);
+			tab.addEventListener('mouseup', navTabClicked);	
+			if(tab.innerHTML.indexOf("Theme") != -1) tab.style.display = "none";
+			
 		})
+		// also here the same issue
+		/*
+		gradioApp().querySelectorAll('[id^="image_buttons"] [id$="_tab"]').forEach(function (button, index){
+			if(button.id == ("img2img_tab" || "inpaint_tab") ){
+				button.setAttribute("tab-id", 1 );
+			}else if(button.id == "extras_tab"){
+				button.setAttribute("tab-id", 2 );
+			}
+			
+			button.removeEventListener('mouseup', navTabClicked);
+			button.addEventListener('mouseup', navTabClicked);	
+			
+			
+		})
+		*/
+		
 
 		netMenuVisibility();
-	}
-	
-	function netMenuVisibility(){
-		if(selectedTabItemId.indexOf("2img") != -1){
-			net_menu.style.display = "block";
-			let nid = selectedTabItemId.split("_")[1];
-			net_container = gradioApp().querySelector('#'+nid+'_extra_networks_row');						
-			if(net_container.classList.contains("aside")){
-				toggleMenu(net_menu_open, net_menu, net_container, null);
-				net_menu.style.display = "block";
-			}else{
-				net_menu.style.display = "none";
-			}
-		}else{
-			net_menu.style.display = "none";			
-		}
 	}
 	
 	// menu 
@@ -457,7 +457,7 @@ onUiUpdate(function(){
 		let rect=el.getBoundingClientRect();
 		return {x:rect.left,y:rect.top};
 	}
-
+	
 	function toggleMenu(isopen, icon, panel, func) {
 		if(isopen){
 			panel.classList.add("open");
@@ -471,7 +471,35 @@ onUiUpdate(function(){
 			enableScroll();	
 		}		
 	}
-
+	
+	// close aside views
+	function closeAsideViews(menu){
+		if(quick_menu != menu && quick_menu_open) quick_menu.click();
+		if(net_menu != menu && net_menu_open) net_menu.click();
+		if(theme_menu != menu && theme_menu_open) theme_menu.click();
+	}
+	
+	// if we change to other view other than 2img and if aside mode is selected close extra networks aside and hide the net menu icon
+	let net_container = gradioApp().querySelector('#txt2img_extra_networks_row');
+	let net_menu_open = false;
+	const net_menu = gradioApp().querySelector('#extra_networks_menu');
+	function netMenuVisibility(){
+		if(selectedTabItemId.indexOf("2img") != -1){
+			net_menu.style.display = "block";
+			let nid = selectedTabItemId.split("_")[1];
+			net_container = gradioApp().querySelector('#'+nid+'_extra_networks_row');						
+			if(net_container.classList.contains("aside")){
+				toggleMenu(net_menu_open, net_menu, net_container, null);
+				net_menu.style.display = "block";
+			}else{
+				net_menu.style.display = "none";
+			}
+		}else{
+			net_menu.style.display = "none";			
+		}
+	}
+	
+	
 	// mobile nav menu
 	const tabs_menu = gradioApp().querySelector('#tabs > div:first-child');
 	const nav_menu = gradioApp().querySelector('#nav_menu');	
@@ -491,7 +519,8 @@ onUiUpdate(function(){
 	let quick_menu_open = false;
 	const quicksettings_overflow = gradioApp().querySelector('#quicksettings_overflow');
 	const quick_menu = gradioApp().querySelector('#quick_menu');	
-	function toggleQuickMenu(e) {			
+	function toggleQuickMenu(e) {
+		closeAsideViews(quick_menu);		
 		quick_menu_open = !quick_menu_open;
 		const withinBoundaries = e.composedPath().includes(quicksettings_overflow);
 		if(!quick_menu_open && withinBoundaries){
@@ -501,20 +530,59 @@ onUiUpdate(function(){
 			e.stopPropagation();
 			toggleMenu(quick_menu_open, quick_menu, quicksettings_overflow, toggleQuickMenu);
 		}
+		
 	}	
     quick_menu.addEventListener('click', toggleQuickMenu);
 	
-	function toggleNetMenu(e) {			
+	// extra networks nav menu
+	function toggleNetMenu(e) {	
+		closeAsideViews(net_menu);		
 		net_menu_open = !net_menu_open;		
 		e.preventDefault();
 		e.stopPropagation();
 		toggleMenu(net_menu_open, net_menu, net_container, null);
-		
 	}	
     net_menu.addEventListener('click', toggleNetMenu);
 	gradioApp().querySelectorAll('button[id$="2img_extra_networks"]').forEach((elem) => {
 		elem.addEventListener('click', toggleNetMenu);
 	})
+	
+	// theme nav menu
+	let theme_container = gradioApp().querySelector('#tab_ui_theme');
+	let theme_menu_open = false;
+	const theme_menu = gradioApp().querySelector('#theme_menu');
+	function toggleThemeMenu(e) {
+		closeAsideViews(theme_menu);			
+		theme_menu_open = !theme_menu_open;		
+		e.preventDefault();
+		e.stopPropagation();
+		toggleMenu(theme_menu_open, theme_menu, theme_container, null);
+		
+	}	
+    theme_menu.addEventListener('click', toggleThemeMenu);
+	
+	const theme_tab = gradioApp().querySelector('#tab_ui_theme');
+	function theme_aside(value){
+		if(value){
+			theme_tab.classList.add("aside");					
+		}else{
+			theme_tab.classList.remove("aside");	
+		}
+	}
+	if(theme_tab) theme_aside(true);
+	
+	function disabled_extensions(value){
+		//console.log(value);		
+		if(value){
+			theme_menu.classList.remove("hidden");			
+		}else{
+			theme_menu.classList.add("hidden");						
+		}
+	}
+	const theme_ext = gradioApp().querySelector('#extensions input[name="enable_sd_theme_editor"]');
+	disabled_extensions(theme_ext.checked);
+	
+	//
 	
 	
 	// additional ui styles 
@@ -533,6 +601,7 @@ onUiUpdate(function(){
 		ui_styles.innerHTML = ops_styles; 
 		//console.log(ui_styles);
 	}
+	
 	// generated image fit contain - scale
 	function imageGeneratedFitMethod(value) {
        styleobj.ui_view_fit = "[id$='2img_gallery'] div>img {object-fit:" + value + ";}"; 
@@ -633,6 +702,7 @@ onUiUpdate(function(){
 	})
 	extra_networks_aside(opts.extra_networks_aside);
 	
+	
 
 	// hidden - header ui tabs
 	let radio_hidden_html="";
@@ -707,7 +777,7 @@ onUiUpdate(function(){
 	
 
 	maintabs.forEach(function (elem, index) {
-		let tabvalue = elem.innerText.replaceAll(" ", "");
+		let tabvalue = elem.innerText.replaceAll(" ", "");		
 		hiddentabs[tabvalue] = false;
 		headertabs[tabvalue] = false;
 		let checked_hidden = "";
@@ -720,8 +790,8 @@ onUiUpdate(function(){
 			headertabs[tabvalue] = true;
 			checked_header = "checked";		
 		}			
-		radio_hidden_html += '<label class="gr-input-label flex items-center text-gray-700 text-sm space-x-2 border py-1.5 px-3 rounded-lg cursor-pointer bg-white shadow-sm checked:shadow-inner"><input type="checkbox" name="uiha" class="gr-check-radio gr-radio" '+checked_hidden+' value="'+elem.innerText+'"><span class="ml-2" title="">'+elem.innerText+'</span></label>';
-		radio_header_html += '<label class="gr-input-label flex items-center text-gray-700 text-sm space-x-2 border py-1.5 px-3 rounded-lg cursor-pointer bg-white shadow-sm checked:shadow-inner"><input type="checkbox" name="uihb" class="gr-check-radio gr-radio" '+checked_header+' value="'+elem.innerText+'"><span class="ml-2" title="">'+elem.innerText+'</span></label>';
+		radio_hidden_html += '<label class="'+tabvalue.toLowerCase()+' gr-input-label flex items-center text-gray-700 text-sm space-x-2 border py-1.5 px-3 rounded-lg cursor-pointer bg-white shadow-sm checked:shadow-inner"><input type="checkbox" name="uiha" class="gr-check-radio gr-radio" '+checked_hidden+' value="'+elem.innerText+'"><span class="ml-2" title="">'+elem.innerText+'</span></label>';
+		radio_header_html += '<label class="'+tabvalue.toLowerCase()+' gr-input-label flex items-center text-gray-700 text-sm space-x-2 border py-1.5 px-3 rounded-lg cursor-pointer bg-white shadow-sm checked:shadow-inner"><input type="checkbox" name="uihb" class="gr-check-radio gr-radio" '+checked_header+' value="'+elem.innerText+'"><span class="ml-2" title="">'+elem.innerText+'</span></label>';
 		
 		tabitems[index].setAttribute("tab-item", index);
 		elem.setAttribute("tab-id", index);
@@ -826,20 +896,24 @@ onUiUpdate(function(){
 	// performant dispatch for gradio's range slider and input number fields
 	function ui_performant_gradio_input_components(sel){
 		let selectors = sel.split(",");
-		selectors.push("#quicksettings_overflow_container");
+		selectors.push("#quicksettings_overflow_container", "#tab_txt2img", "#tab_img2img", "#tab_extras", "#tab_modelmerger", "#tab_ti");
 		selectors = selectors.filter(e => e);
 		for (let i = 0; i < selectors.length; i++) {
 			selectors[i] = selectors[i]+" input[type='number']";
 		}
 		let input_selectors = selectors.join(",");
 		
-		gradioApp().querySelectorAll(input_selectors).forEach(function (elem){
+		gradioApp().querySelectorAll(input_selectors).forEach(function (elem, index){
 			let parent = elem.parentElement;
 			let label = parent.querySelector("label");
 			
-			let clone_num = elem.cloneNode(true);			
-			parent.append(clone_num);
-			elem.style.display = "none";
+			//console.log(elem.value);
+			
+			let clone_num = elem.cloneNode(true);
+			clone_num.id = "num_clone_"+index;
+			clone_num.value = elem.value;	
+			parent.append(clone_num);			
+			elem.classList.add("hidden");
 			
 			clone_num.addEventListener('change', function (e) {			
 				elem.value = clone_num.value;
@@ -849,9 +923,10 @@ onUiUpdate(function(){
 			if(label){				
 				let comp_range = parent.parentElement.parentElement.querySelector("input[type='range']");
 				let clone_range = comp_range.cloneNode(true);
-				clone_range.id = comp_range.id+"_clone";		
-				comp_range.parentElement.append(clone_range);
-				comp_range.style.display = "none";
+				clone_range.id = comp_range.id+"_clone";
+				clone_range.value = comp_range.value;					
+				comp_range.parentElement.append(clone_range);				
+				comp_range.classList.add("hidden");
 
 				clone_range.addEventListener('input', function (e) {								
 					clone_num.value = e.target.value;	
@@ -869,6 +944,29 @@ onUiUpdate(function(){
 	}	
 	ui_performant_gradio_input_components(opts.ui_performant_gradio_input_components);
 	
+	// step ticks for performant input range
+	function ui_show_range_ticks(value, interactive){
+		if(value){
+			//const range_selectors = "input[type='range']"; 
+			const range_selectors = "[id$='_clone']:is(input[type='range'])";
+			gradioApp().querySelectorAll(range_selectors).forEach(function (elem){
+				let spacing = ((elem.step / ( elem.max - elem.min )) * 100.0);	
+				let tsp = 'max(3px, calc('+spacing+'% - 2px))';
+				let fsp = 'max(4px, calc('+spacing+'% + 0px))';
+				var style = elem.style;
+				style.setProperty('--slider-bg-overlay', 'repeating-linear-gradient( 90deg, transparent, transparent '+tsp+', var(--input-border-color) '+tsp+', var(--input-border-color) '+fsp+' )');
+			})
+		}else if(interactive){
+			gradioApp().querySelectorAll("input[type='range']").forEach(function (elem){				
+				var style = elem.style;
+				style.setProperty('--slider-bg-overlay', 'transparent');
+			})
+		}
+	}
+	gradioApp().querySelector("#setting_ui_show_range_ticks input").addEventListener('click', function (e) {		
+		ui_show_range_ticks(e.target.checked, true);
+	})
+	ui_show_range_ticks(opts.ui_show_range_ticks);
 	
 	// draggable reordable quicksettings
     const container = gradioApp().querySelector("#quicksettings_overflow_container");  
@@ -882,6 +980,28 @@ onUiUpdate(function(){
 		e.preventDefault();
 		return false;
 	}
+
+	function update_performant_inputs(tab){
+		let input_selectors = "#tab_"+ tab + " [id^='num_clone']:is(input[type='number'])";
+		//console.log(input_selectors);
+		gradioApp().querySelectorAll(input_selectors).forEach(function (elem){
+			let elem_source = elem.previousElementSibling;		
+			elem.value = elem_source.value;
+			updateInput(elem);	
+		})	
+	}
+	
+	gradioApp().querySelectorAll("#tab_pnginfo #png_2img_results button, [id$='2img_actions_column'] #paste").forEach(function (elem){			
+		elem.addEventListener('click', function (e) {
+			let button_id;
+			if(e.target.id == "paste"){
+				button_id = e.target.nextElementSibling.id.split("_")[0];
+			}else{
+				button_id = e.target.id.split("_")[0];
+			}
+			setTimeout(function() { update_performant_inputs(button_id); }, 500);		
+		})	
+	})			
 
 	const pnginfo = gradioApp().querySelector("#tab_pnginfo"); 
 	function forwardFromPngInfo(){
@@ -899,8 +1019,9 @@ onUiUpdate(function(){
 				gallery_parent.prepend(div);
 			}			
 		}else if(selectedTabItemId == "tab_img2img"){
-			pnginfo.querySelector('#img2img_tab').click();
+			pnginfo.querySelector('#img2img_tab').click();		
 		}
+		//setTimeout(function() { update_performant_inputs(button_id.split("_")[0]); }, 100);
 	}
 	
 	function fetchPngInfoData(files){
@@ -1117,6 +1238,8 @@ let token_timeouts = {};
 
 function update_txt2img_tokens(...args) {
 	update_token_counter("txt2img_token_button")
+	//setTimeout(function() { update_performant_inputs("txt2img"); }, 500);	
+	console.log("update_txt2img_tokens");
 	if (args.length == 2)
 		return args[0]
 	return args;
@@ -1124,6 +1247,8 @@ function update_txt2img_tokens(...args) {
 
 function update_img2img_tokens(...args) {
 	update_token_counter("img2img_token_button")
+	console.log("update_img2img_tokens");
+	//setTimeout(function() { update_performant_inputs("img2img"); }, 500);	
 	if (args.length == 2)
 		return args[0]
 	return args;
