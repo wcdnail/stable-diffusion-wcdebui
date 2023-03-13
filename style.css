@@ -344,9 +344,11 @@ body {
   display: block;
 }
 
+#ui_add2quick_setting_hidden_tabs,
 [id*="add2quick_setting_quicksettings"]{
 	display:none;
 }
+
 
 
 /* icons */
@@ -1317,7 +1319,7 @@ input
     max-width: unset;
 	flex-grow: 0;
 }
-
+/*
 [id*="2img_seed"] input[type=number],
 [id*="2img_subseed"] input[type=number]{
 	display:none;
@@ -1326,7 +1328,7 @@ input
 [id*="2img_subseed"] input[type=number].hidden{
 	display:block !important;
 }
-
+*/
 /*
 button
 {
@@ -2302,21 +2304,40 @@ ul.list-none {
 	max-height:unset;
 }
 
+[id$="2img_override_settings"] .token{
+	max-height: 30px;
+    min-height: 30px;
+    padding: 3px 10px 3px 0;
+}
+
 [id$="2img_override_settings"] .token > div{
 	top:1px !important;
 	left:4px !important;
+}
+
+[id$="2img_override_settings"] div > input,
+[id$="2img_override_settings"] .token + div > input{
+	margin: 0;
+    margin-right: 8px;
+    border-right: 1px solid var(--panel-border-color);
+    min-height: 32px;
 }
 
 [id$="2img_override_settings"] .token span{
 	position:relative;
 	top:-2px;
 }
+.show{
+	display:block !important;
+}
+
 /* x svg icon styles */ 
 .gr-input-label div:first-child {
     position: relative;
     top: 0px;
     left: 2px;
 }
+
 
 
 /**********/
@@ -3042,9 +3063,7 @@ ul.list-none {
 
 #modalImage {
     display: block;
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: auto;
+    margin: auto;
     width: auto;
 }
 
@@ -3360,6 +3379,7 @@ footer {
 	display: flex;
 }
 
+
 .footer-links > li > div,
 .footer-links > li > a {
     position: absolute;
@@ -3369,6 +3389,7 @@ footer {
     font-size: 24px;
     fill: var(--primary-color);
 }
+
 
 .footer-links > li:last-child {
   position: absolute;
@@ -3513,6 +3534,11 @@ a[data-tooltip][data-position=bottom]:after {
 	position: relative;
     display: block;
 }
+/*
+.extra-network-thumbs .card:hover .additional a {
+    display: inline-block;
+}
+*/
 
 .tooltip-html .icon-info {	 
     fill: var(--primary-color);
@@ -3697,6 +3723,9 @@ input[type=range]::after:: {
 	width: 100%;
 }
 
+#quicksettings_overflow_container,
+#theme_overflow_container,
+[id$="2img_checkpoints_cards"],
 [id$="2img_results"],
 [id$="2img_settings_scroll"] 
 {
@@ -3758,6 +3787,32 @@ input[type=range]::-ms-fill-lower {
 input[type=range]::-ms-fill-upper {
     background-color: var(--input-bg-color);
 }
+
+
+.extra-network-cards .card .actions .description {
+    display: block;
+    max-height: 3em;
+    white-space: pre-wrap;
+    line-height: 1.1;
+}
+
+.extra-network-cards .card .actions .description:hover {
+    max-height: none;
+}
+
+.extra-network-cards .card .actions:hover .additional{
+    display: block;
+}
+
+#setting_hidden_tabs{
+	display:none !important;
+}
+
+#txt2img_results .modify-upload + img.w-full.object-contain{
+	cursor: pointer;
+}
+
+
 
 
 
